@@ -38,7 +38,8 @@ services:
       - .:/app
     env_file: .env
     working_dir: /app
-    command: bash -c 'php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000'
+    # wait 2 minutes for the DB to initialize, And then start the Migration & finally Serve
+    command: bash -c 'sleep 2m && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000'
     ports:
       - "8181:8000"
     depends_on:
