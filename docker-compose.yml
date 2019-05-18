@@ -1,0 +1,52 @@
+version: '2'
+services:
+
+  # Database
+  mysqlDB:
+    image: "mysql:5.7"
+    container_name: larablog_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secretPassword
+      - MYSQL_DATABASE=larablog
+      - MYSQL_USER=root
+      # - MYSQL_PASSWORD=secretPassword
+      # - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    volumes:
+      - ./datadir/:/var/lib/mysql
+    ports:
+      - "3306:3306"
+  
+  # PHP myAdmin
+  phpmyadmin:
+    depends_on:
+      - mysqlDB
+    image: phpmyadmin/phpmyadmin
+    container_name: larablog_phpMyAdmin
+    restart: always
+    ports:
+      - 8090:80
+    environment:
+      PMA_HOST: mysqlDB
+      MYSQL_ROOT_PASSWORD: secretPassword
+
+  # Application
+  app:
+    image: nahid19/larablog
+    build: .
+    container_name: larablog_app
+    volumes:
+      - .:/app
+    env_file: .env
+    working_dir: /app
+    command: bash -c 'php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000'
+    ports:
+      - "8181:8000"
+    depends_on:
+      - mysqlDB
+    links:
+      - mysqlDB
+  
+  
+
+
+
